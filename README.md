@@ -10,31 +10,6 @@ This project ingests transactional sales data, engineers time-series features, t
 
 ---
 
-## Project Structure
-
-```
-.
-├── app.py              # Flask API (endpoints: /, /train, /predict, /logs)
-├── model.py            # Feature engineering, model training, and prediction
-├── ingest.py           # Data loading and preprocessing
-├── logger.py           # Logging for train and predict events
-├── monitor.py          # Model monitoring via Wasserstein distance
-├── eda.py              # Exploratory data analysis and plot generation
-├── check_countries.py  # Utility to list available countries in the dataset
-├── requirements.txt    # Python dependencies
-├── Dockerfile          # Container definition
-├── run_tests.py        # Test runner script
-├── test_api.py         # Unit tests for the Flask API
-├── test_model.py       # Unit tests for feature engineering and model logic
-├── test_logger.py      # Unit tests for the logging module
-├── models/             # Saved model files (.pkl)
-├── logs/               # Prediction and training logs (CSV)
-├── data/cs-train/      # Input data directory (JSON files)
-└── eda_plots/          # Output plots from EDA script
-```
-
----
-
 ## Setup
 
 **Prerequisites:** Python 3.8+
