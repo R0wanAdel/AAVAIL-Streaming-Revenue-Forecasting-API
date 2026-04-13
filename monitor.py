@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Monitoring module for AI Workflow Capstone
 Uses Wasserstein distance to compare predicted vs actual distributions.

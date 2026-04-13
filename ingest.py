@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Data ingestion module for AI Workflow Capstone
 Loads and processes JSON sales data files into a unified DataFrame

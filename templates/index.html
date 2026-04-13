@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAVAIL AI Revenue Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <div class="container">
+        <header class="glass-header">
+            <h1>AAVAIL <span class="accent">AI Engine</span></h1>
+            <p>Advanced Streaming Revenue Forecasting</p>
+        </header>
+
+        <main class="dashboard">
+            <!-- Train Model Card -->
+            <section class="glass-card" id="card-train">
+                <div class="card-header">
+                    <h2><span class="icon">⚙️</span> Retrain Model</h2>
+                </div>
+                <form id="train-form" class="styled-form">
+                    <div class="form-group">
+                        <label for="train-country">Country Context</label>
+                        <select id="train-country" name="country">
+                            <option value="all">Global (All Countries)</option>
+                            <option value="eire">EIRE</option>
+                            <option value="france">France</option>
+                            <option value="germany">Germany</option>
+                            <option value="netherlands">Netherlands</option>
+                            <option value="portugal">Portugal</option>
+                            <option value="spain">Spain</option>
+                            <option value="united_kingdom">United Kingdom</option>
+                        </select>
+                    </div>
+                    <div class="form-group row-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="train-test" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">Test Mode (Quick)</span>
+                    </div>
+                    <button type="submit" class="btn-primary" id="btn-train">
+                        <span class="btn-text">Initiate Training</span>
+                        <span class="loader hidden"></span>
+                    </button>
+                    <div id="train-result" class="result-box hidden"></div>
+                </form>
+            </section>
+
+            <!-- Predict Revenue Card -->
+            <section class="glass-card" id="card-predict">
+                <div class="card-header">
+                    <h2><span class="icon">📈</span> Forecast Revenue</h2>
+                </div>
+                <form id="predict-form" class="styled-form">
+                    <div class="form-group">
+                        <label for="predict-country">Target Market</label>
+                        <select id="predict-country" name="country">
+                            <option value="all">Global (All Countries)</option>
+                            <option value="eire">EIRE</option>
+                            <option value="france">France</option>
+                            <option value="germany">Germany</option>
+                            <option value="netherlands">Netherlands</option>
+                            <option value="portugal">Portugal</option>
+                            <option value="spain">Spain</option>
+                            <option value="united_kingdom">United Kingdom</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="predict-date">Target Date (YYYY-MM-DD)</label>
+                        <input type="date" id="predict-date" required value="2019-08-01">
+                    </div>
+                     <div class="form-group row-group">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="predict-test" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">Test Mode</span>
+                    </div>
+                    <button type="submit" class="btn-accent" id="btn-predict">
+                        <span class="btn-text">Generate Forecast</span>
+                        <span class="loader hidden"></span>
+                    </button>
+                    <div id="predict-result" class="result-box metric-box hidden">
+                        <span class="metric-label">30-Day Outlook</span>
+                        <span class="metric-value" id="predict-value">$0.00</span>
+                    </div>
+                </form>
+            </section>
+
+            <!-- System Logs Card -->
+            <section class="glass-card full-width" id="card-logs">
+                <div class="card-header flex-between">
+                    <h2><span class="icon">📊</span> Diagnostics & Logs</h2>
+                    <button id="btn-refresh-logs" class="btn-secondary">Refresh</button>
+                </div>
+                 <div class="form-group row-group" style="margin-top: 1rem;">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="logs-test" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">View Test Logs</span>
+                    </div>
+                <div class="table-container">
+                    <table class="styled-table" id="logs-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Country</th>
+                                <th>Date Target</th>
+                                <th>Prediction</th>
+                                <th>Runtime (s)</th>
+                                <th>Version</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

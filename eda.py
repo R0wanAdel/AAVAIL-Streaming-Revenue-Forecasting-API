@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 EDA Script for AI Workflow Capstone
 Investigates revenue data, generates visualizations, and compares models to baseline.

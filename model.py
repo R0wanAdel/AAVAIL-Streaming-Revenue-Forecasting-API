@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Model module for AI Workflow Capstone
 Trains time-series revenue prediction models using enriched lag + seasonality features.
