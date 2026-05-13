@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Flask API for AI Workflow Capstone
 Endpoints: /, /train, /predict, /logs
@@ -6,33 +5,15 @@ Endpoints: /, /train, /predict, /logs
 
 import time
 import os
-from flask import Flask, jsonify, request, render_template_string
+from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__)
 
 MODEL_VERSION = "1.0"
 
-HOME_HTML = """
-<!DOCTYPE html>
-<html>
-<head><title>AAVAIL Revenue Prediction API</title></head>
-<body>
-<h1>AAVAIL Revenue Prediction API</h1>
-<p>Available endpoints:</p>
-<ul>
-  <li><b>GET /</b> - This page</li>
-  <li><b>POST /train</b> - Train the model. JSON body: {"country": "France", "test": false}</li>
-  <li><b>POST /predict</b> - Predict revenue. JSON body: {"country": "France", "date": "2019-08-01", "test": false}</li>
-  <li><b>GET /logs</b> - View prediction logs. Query params: ?test=true</li>
-</ul>
-</body>
-</html>
-"""
-
-
 @app.route("/")
 def index():
-    return render_template_string(HOME_HTML)
+    return render_template("index.html")
 
 
 @app.route("/train", methods=["POST"])

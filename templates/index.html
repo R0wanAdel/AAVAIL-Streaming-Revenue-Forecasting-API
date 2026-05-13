@@ -8,15 +8,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
+    <!-- Animated Background Elements -->
     <div class="background-elements">
         <div class="glow-orb orb-1"></div>
         <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
     </div>
 
     <div class="container">
         <header class="glass-header">
-            <h1>AAVAIL <span class="accent">AI Engine</span></h1>
-            <p>Advanced Streaming Revenue Forecasting</p>
+            <div class="brand">
+                <h1>AAVAIL <span class="accent">AI Engine</span></h1>
+                <p>Advanced Streaming Revenue Forecasting</p>
+            </div>
+            <div class="system-status">
+                <span class="status-dot"></span> System Operational
+            </div>
         </header>
 
         <main class="dashboard">
@@ -30,13 +37,13 @@
                         <label for="train-country">Country Context</label>
                         <select id="train-country" name="country">
                             <option value="all">Global (All Countries)</option>
-                            <option value="eire">EIRE</option>
-                            <option value="france">France</option>
-                            <option value="germany">Germany</option>
-                            <option value="netherlands">Netherlands</option>
-                            <option value="portugal">Portugal</option>
-                            <option value="spain">Spain</option>
-                            <option value="united_kingdom">United Kingdom</option>
+                            <option value="EIRE">EIRE</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Portugal">Portugal</option>
+                            <option value="Spain">Spain</option>
+                            <option value="United Kingdom">United Kingdom</option>
                         </select>
                     </div>
                     <div class="form-group row-group">
@@ -64,17 +71,17 @@
                         <label for="predict-country">Target Market</label>
                         <select id="predict-country" name="country">
                             <option value="all">Global (All Countries)</option>
-                            <option value="eire">EIRE</option>
-                            <option value="france">France</option>
-                            <option value="germany">Germany</option>
-                            <option value="netherlands">Netherlands</option>
-                            <option value="portugal">Portugal</option>
-                            <option value="spain">Spain</option>
-                            <option value="united_kingdom">United Kingdom</option>
+                            <option value="EIRE">EIRE</option>
+                            <option value="France">France</option>
+                            <option value="Germany">Germany</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Portugal">Portugal</option>
+                            <option value="Spain">Spain</option>
+                            <option value="United Kingdom">United Kingdom</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="predict-date">Target Date (YYYY-MM-DD)</label>
+                        <label for="predict-date">Target Date</label>
                         <input type="date" id="predict-date" required value="2019-08-01">
                     </div>
                      <div class="form-group row-group">
@@ -99,15 +106,17 @@
             <section class="glass-card full-width" id="card-logs">
                 <div class="card-header flex-between">
                     <h2><span class="icon">📊</span> Diagnostics & Logs</h2>
-                    <button id="btn-refresh-logs" class="btn-secondary">Refresh</button>
-                </div>
-                 <div class="form-group row-group" style="margin-top: 1rem;">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="logs-test" checked>
-                            <span class="slider"></span>
-                        </label>
-                        <span class="toggle-label">View Test Logs</span>
+                    <div class="header-actions">
+                        <div class="form-group row-group">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="logs-test" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="toggle-label">Test Logs</span>
+                        </div>
+                        <button id="btn-refresh-logs" class="btn-secondary">Refresh</button>
                     </div>
+                </div>
                 <div class="table-container">
                     <table class="styled-table" id="logs-table">
                         <thead>
