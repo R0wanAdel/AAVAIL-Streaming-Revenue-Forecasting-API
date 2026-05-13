@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             setLoading(btn, true);
             resultBox.classList.add('hidden');
-            resultBox.className = 'result-box hidden'; // Reset classes
+            resultBox.className = 'result-box hidden'; 
 
             try {
                 const response = await fetch('/train', {
@@ -31,7 +31,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Training failed');
 
-                resultBox.innerHTML = `<strong>Success!</strong> Model trained. Runtime: ${data.runtime.toFixed(2)}s`;
+                // Displaying enhanced metrics from the new response structure
+                const m = data.metrics;
+                resultBox.innerHTML = `
+                    <div class="success-header"><strong>Success!</strong> Model trained in ${data.runtime.toFixed(2)}s</div>
+                    <div class="metrics-grid" style="display: grid; grid-template-columns: 1-fr 1fr; gap: 10px; margin-top: 10px; font-size: 0.9em;">
+                        <span><strong>MAE %:</strong> ${m.mae_pct}%</span>
+                        <span><strong>RMSE %:</strong> ${m.rmse_pct}%</span>
+                        <span><strong>MAPE:</strong> ${m.mape}</span>
+                        <span><strong>Model:</strong> ${m.model_type.toUpperCase()}</span>
+                        <span><strong>Train Size:</strong> ${m.train_size}</span>
+                        <span><strong>Features:</strong> ${m.n_features}</span>
+                    </div>
+                `;
                 resultBox.classList.remove('hidden');
                 resultBox.classList.add('success-msg');
             } catch (error) {
@@ -77,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     currency: 'USD',
                 });
 
+                // Mapping the specific key: predicted_revenue_30_days
                 valueSpan.textContent = formatter.format(data.predicted_revenue_30_days);
                 resultBox.classList.remove('hidden');
             } catch (error) {
@@ -136,18 +149,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         btn.disabled = isLoading;
         if (isLoading) {
-            text.style.display = 'none';
-            loader.classList.remove('hidden');
+            if (text) text.style.display = 'none';
+            if (loader) loader.classList.remove('hidden');
         } else {
-            text.style.display = 'block';
-            loader.classList.add('hidden');
+            if (text) text.style.display = 'block';
+            if (loader) loader.classList.add('hidden');
         }
     }
 
-    // Event Listeners for Logs
     if (btnRefreshLogs) btnRefreshLogs.addEventListener('click', loadLogs);
     if (logsTest) logsTest.addEventListener('change', loadLogs);
 
-    // Initial load
     loadLogs();
 });
