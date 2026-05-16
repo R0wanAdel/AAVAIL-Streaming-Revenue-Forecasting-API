@@ -1,12 +1,12 @@
 # AAVAIL Streaming Revenue Forecasting API
 
-A Flask-based REST API for predicting 30-day streaming revenue by country, using time-series lag features and ensemble machine learning models. Built as part of the AI Workflow Capstone.
+A Flask-based REST API for predicting 30-day streaming revenue by country using ensemble machine learning models with a StandardScaler pipeline. Built as part of the AI Workflow Capstone.
 
 ---
 
 ## Overview
 
-This project ingests transactional sales data, engineers time-series features, trains revenue prediction models (Random Forest, Gradient Boosting, Linear Regression baseline), and exposes predictions through a simple REST API. Prediction and training events are logged separately for test and production environments.
+This project ingests transactional sales data, engineers time-series features, trains revenue prediction models using scikit-learn Pipelines, and exposes predictions through a REST API. Prediction and training events are logged separately for test and production environments. A monitoring module tracks model drift via Wasserstein distance.
 
 ---
 
@@ -18,7 +18,13 @@ This project ingests transactional sales data, engineers time-series features, t
 pip install -r requirements.txt
 ```
 
-**Data:** Place JSON sales data files in `data/cs-train/`. Each file should contain transactional records with fields including `country`, `price`, `times_viewed`, `year`, `month`, and `day`.
+**Data:** Place JSON sales data files in `data/cs-train/`. Each file should contain transactional records with fields including `country`, `price`, `times_viewed`, `year`, `month`, and `day`. To generate synthetic data:
+
+```bash
+python generate_data.py
+```
+
+This produces monthly JSON files in `data/cs-train/` covering 2017–2019.
 
 ---
 
@@ -42,7 +48,7 @@ docker run -p 8080:8080 aavail-api
 ## API Endpoints
 
 ### `GET /`
-Returns a summary of available endpoints.
+Returns the web UI dashboard.
 
 ---
 
@@ -63,18 +69,19 @@ Trains a revenue prediction model for a given country.
   "status": "success",
   "country": "United Kingdom",
   "metrics": {
-    "model_type": "rf",
-    "rmse": 12345.67,
-    "mae": 9876.54,
-    "train_size": 200,
-    "test_size": 50,
+    "model_type": "Random Forest Regressor",
+    "mae_pct": 4.21,
+    "rmse_pct": 5.87,
+    "mape": 0.0423,
+    "train_size": 320,
+    "n_features": 3,
     "trained_at": "2024-01-15 10:30:00"
   },
   "runtime": 1.23
 }
 ```
 
-Use `"country": "all"` to train on aggregated data across all countries. Set `"test": true` to train in test mode (model saved separately from production).
+Use `"country": "all"` to train on aggregated data across all countries. Set `"test": true` to train in test mode (uses fewer estimators; model saved separately from production).
 
 ---
 
@@ -121,30 +128,40 @@ Returns prediction log entries.
 }
 ```
 
+Each log entry includes `timestamp`, `country`, `target_date`, `y_pred`, `runtime`, and `model_version`.
+
 ---
 
 ## Model Details
 
-**Feature engineering** (`model.py → engineer_features`): For each day in the time series, four lag features are computed:
+**Architecture:** scikit-learn `Pipeline` with `StandardScaler` + `RandomForestRegressor`.
+
+**Features** (3 input features per sample):
 
 | Feature | Description |
 |---|---|
-| `prev_day` | Revenue from the previous day |
-| `prev_week` | Revenue sum over the previous 7 days |
-| `prev_month` | Revenue sum over the previous 30 days |
-| `prev_3months` | Revenue sum over the previous 90 days |
+| `past_7d_rev` | Revenue over the prior 7 days |
+| `past_30d_rev` | Revenue over the prior 30 days |
+| `sub_share` | Active subscriber count share |
 
 **Target:** Total revenue over the next 30 days.
 
-**Models available:**
+**Evaluation metrics returned at training time:**
 
-| Key | Model |
+| Metric | Description |
 |---|---|
-| `rf` | Random Forest Regressor (default, 100 estimators) |
-| `gb` | Gradient Boosting Regressor (100 estimators) |
-| `baseline` | Linear Regression |
+| `mae_pct` | Mean Absolute Error as % of mean actual revenue |
+| `rmse_pct` | Root Mean Square Error as % of mean actual revenue |
+| `mape` | Mean Absolute Percentage Error |
 
-Trained models are saved to `models/` as `.pkl` files, named by country and mode (e.g., `model_united_kingdom_prod.pkl`).
+**Model variants by mode:**
+
+| Mode | Estimators | Saved as |
+|---|---|---|
+| Production (`test=false`) | 150 | `<country>_prod.pkl` |
+| Test (`test=true`) | 50 | `<country>_test.pkl` |
+
+Trained models are saved to `models/` as `.pkl` files (e.g., `united_kingdom_prod.pkl`).
 
 ---
 
@@ -155,6 +172,8 @@ The `monitor.py` module computes the **Wasserstein distance** between the distri
 ```bash
 python monitor.py
 ```
+
+Returns country, Wasserstein distance, prediction count, and mean/std for both predicted and actual distributions.
 
 ---
 
@@ -191,7 +210,10 @@ python -m unittest test_model.py
 python -m unittest test_logger.py
 ```
 
-Tests cover API endpoint validation, feature engineering correctness, and logging behavior (with isolated temp directories to avoid polluting production logs).
+**Test coverage:**
+- `test_api.py` — API endpoint validation (missing fields, bad payloads, logs endpoint)
+- `test_model.py` — Feature engineering shape, edge cases (insufficient data), prediction type checks
+- `test_logger.py` — Log file creation, content correctness, test/prod separation, multi-entry logging; uses isolated temp directories to avoid polluting production logs
 
 ---
 
@@ -205,4 +227,34 @@ Logs are written to CSV files in the `logs/` directory:
 | `predict-test.log` | Test prediction events |
 | `train.log` | Training events (all modes) |
 
-Each log entry captures a unique ID, timestamp, country, date, predicted value, runtime, model version, and test/prod flag.
+Each log entry captures: `unique_id`, `timestamp`, `country`, `date`, `y_pred` or `eval_test`, `runtime_seconds`, `model_version`, and `test_mode`.
+
+---
+
+## Project Structure
+
+```
+.
+├── app.py              # Flask API (/, /train, /predict, /logs)
+├── model.py            # Training pipeline and prediction logic
+├── ingest.py           # Data loading and aggregation
+├── logger.py           # CSV logging (train + predict, test + prod)
+├── monitor.py          # Wasserstein drift detection
+├── eda.py              # Exploratory data analysis and plots
+├── generate_data.py    # Synthetic data generator (2017–2019)
+├── run_tests.py        # Test runner
+├── test_api.py         # API unit tests
+├── test_model.py       # Model unit tests
+├── test_logger.py      # Logger unit tests
+├── requirements.txt
+├── Dockerfile
+├── data/cs-train/      # JSON sales data files
+├── models/             # Saved .pkl model files
+├── logs/               # CSV prediction and training logs
+├── eda_plots/          # Generated EDA plot images
+├── static/
+│   ├── app.js          # Frontend dashboard logic
+│   └── index.css       # Dashboard styles
+└── templates/
+    └── index.html      # Web UI template
+```
